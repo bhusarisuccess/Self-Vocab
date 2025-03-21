@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                             SplashScreen(navController)
                         }
                         composable("home") {
-                            HomeScreen()
+                            HomeScreen(database = WordDatabase.getDatabase(applicationContext), )
                         }
                         composable("list") {
                             ListScreen( database = WordDatabase.getDatabase(applicationContext))

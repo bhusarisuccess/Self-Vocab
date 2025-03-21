@@ -17,4 +17,6 @@ interface WordDao {
 
     @Delete
     suspend fun deleteWords(wordEntry: WordEntry)
+    @Query("SELECT * FROM WordEntry ORDER BY id DESC LIMIT 1")
+    fun getLatestWord(): Flow<WordEntry?>
 }

@@ -14,6 +14,15 @@ class DictionaryViewModel(database: WordDatabase) : ViewModel() {
     private val wordDao = database.wordDao()
     private val _words = MutableStateFlow<List<WordEntry>>(emptyList())
     val words: StateFlow<List<WordEntry>> = _words
+    private val _latestWord = MutableStateFlow<WordEntry?>(null)
+    val latestWord: StateFlow<WordEntry?> = _latestWord
+    init {
+        viewModelScope.launch {
+            wordDao.getLatestWord().collect { word ->
+                _latestWord.value = word
+            }
+        }
+    }
 
     init {
         viewModelScope.launch {
