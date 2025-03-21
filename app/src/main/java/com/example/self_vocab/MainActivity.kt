@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.self_vocab.data.WordDatabase
 import com.example.self_vocab.ui.screens.BottomNavigationMenu
 import com.example.self_vocab.ui.screens.HomeScreen
 import com.example.self_vocab.ui.screens.ListScreen
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
                             HomeScreen()
                         }
                         composable("list") {
-                            ListScreen()
+                            ListScreen( database = WordDatabase.getDatabase(applicationContext))
                         }
                         composable("settings") {
                             Settingscreen()
@@ -55,6 +56,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
     }
 }

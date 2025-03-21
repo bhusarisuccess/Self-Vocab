@@ -1,25 +1,24 @@
 package com.example.self_vocab.data
 
-import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.self_vocab.Entity.DictionaryEntry
+import com.example.self_vocab.Entity.WordEntry
 
-@Database(entities = [DictionaryEntry::class], version = 1)
-abstract class DictionaryDatabase : RoomDatabase() {
-    abstract fun dictionaryDao(): DictionaryDao
 
+@Database(entities = [WordEntry::class], version = 1)
+abstract class WordDatabase : RoomDatabase() {
+    abstract fun wordDao(): WordDao
     companion object {
         @Volatile
-        private var INSTANCE: DictionaryDatabase? = null
+        private var INSTANCE: WordDatabase? = null
 
-        fun getDatabase(context: Context): DictionaryDatabase {
+        fun getDatabase(context: android.content.Context): WordDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    DictionaryDatabase::class.java,
-                    "dictionary_database"
+                    WordDatabase::class.java,
+                    "Vocab_Database"
                 ).build()
                 INSTANCE = instance
                 instance
