@@ -46,21 +46,38 @@ android {
 
 dependencies {
 
+    // Core KTX
     implementation(libs.androidx.core.ktx)
+    // Kotlin BOM (Bill of Materials)
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:2.0.21"))
+    // Lifecycle Runtime KTX
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    // Activity Compose
+    implementation("androidx.activity:activity-compose:1.10.1")
+    // Compose BOM
+    implementation(libs.compose.bom.v20250300)
+    // Jetpack Compose UI
+    implementation(libs.ui)
+    // Compose UI Graphics
+    implementation(libs.ui.graphics)
+    // Compose UI Tooling Preview
+    implementation(libs.ui.tooling.preview)
+    // Material3 for Compose
+    implementation(libs.material3)
+    // Unit Testing with JUnit
     testImplementation(libs.junit)
+    // Android Test Extensions for JUnit
     androidTestImplementation(libs.androidx.junit)
+    // Espresso for UI Testing
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    // Compose BOM for Android Tests
+    androidTestImplementation(libs.compose.bom.v20250300)
+    // Compose UI Test JUnit4
+  //  androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // Debugging dependencies
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
     //hilt dependenices
     implementation ("com.google.dagger:hilt-android:2.54")
     kapt ("com.google.dagger:hilt-compiler:2.54")

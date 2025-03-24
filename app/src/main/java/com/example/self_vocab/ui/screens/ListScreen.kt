@@ -3,6 +3,7 @@ package com.example.self_vocab.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -10,24 +11,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,17 +41,49 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.self_vocab.DViewModel.DictionaryViewModel
 import com.example.self_vocab.Entity.WordEntry
 import com.example.self_vocab.data.WordDatabase
+import com.example.self_vocab.ui.theme.PrimaryColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListScreen(database: WordDatabase) {
+fun ListScreen(navController: NavHostController) {
+    var showSheet = remember { mutableStateOf(false) }
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("List") }) },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                text = { Text(text = "Add Word") },
+                onClick = {
+                    showSheet.value = true
+                },
+                containerColor = PrimaryColor,
+                contentColor = Color.White,
+                icon = { Icon(Icons.Filled.Add, "") },
+                modifier = Modifier.padding(bottom = 80.dp)
+            )
+        },
+        content = { paddingValues ->
+            ListScreenContent(navController, paddingValues, showSheet)
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ListScreenContent(
+    navController: NavHostController,
+    paddingValues: PaddingValues,
+    showSheet: MutableState<Boolean>
+) {
+    val database: WordDatabase = WordDatabase.getDatabase(LocalContext.current)
     val viewModel: DictionaryViewModel = viewModel(factory = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
@@ -56,12 +92,10 @@ fun ListScreen(database: WordDatabase) {
     })
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-    var showSheet by remember { mutableStateOf(false) }
     val words by viewModel.words.collectAsState()
     var searchText by remember { mutableStateOf("") }
-
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.padding(paddingValues),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -79,15 +113,15 @@ fun ListScreen(database: WordDatabase) {
             verticalArrangement = Arrangement.Bottom
         ) {
             PartialBottomSheet(
+                showSheet,
                 onSave = { word, meaning, sentence ->
                     viewModel.addWord(word, meaning, sentence)
-                    showSheet = false
+                    showSheet.value = false
                 }
             )
         }
     }
 }
-
 
 @Composable
 fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit) {
@@ -104,14 +138,18 @@ fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit) {
 
 @Composable
 fun WordList(words: List<WordEntry>, viewModel: DictionaryViewModel) {
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .fillMaxWidth()
-        .padding(5.dp)) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .fillMaxWidth()
+            .padding(5.dp)
+    ) {
         items(words) { word ->
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .padding(2.dp)) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(2.dp)
+            ) {
                 Column(modifier = Modifier.padding(10.dp)) {
                     Text(text = "Word: ${word.word}", style = MaterialTheme.typography.titleLarge)
                     Text(
@@ -136,8 +174,7 @@ fun WordList(words: List<WordEntry>, viewModel: DictionaryViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PartialBottomSheet(onSave: (String, String, String) -> Unit) {
-    var showBottomSheet by remember { mutableStateOf(false) }
+fun PartialBottomSheet(showSheet: MutableState<Boolean>, onSave: (String, String, String) -> Unit) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
     )
@@ -149,22 +186,11 @@ fun PartialBottomSheet(onSave: (String, String, String) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Button(
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(bottom = 50.dp, end = 20.dp),
-            onClick = {
-                showBottomSheet = true
-            }
-        ) {
-            Icon(Icons.Default.AddCircle, contentDescription = "Add Icon")
-        }
-
-        if (showBottomSheet) {
+        if (showSheet.value) {
             ModalBottomSheet(
                 modifier = Modifier.fillMaxHeight(),
                 sheetState = sheetState,
-                onDismissRequest = { showBottomSheet = false }
+                onDismissRequest = { showSheet.value = false }
             ) {
                 Text(
                     "Swipe up to open sheet. Swipe down to dismiss.",
@@ -218,7 +244,7 @@ fun PartialBottomSheet(onSave: (String, String, String) -> Unit) {
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Button(
-                            onClick = { showBottomSheet = false },
+                            onClick = { showSheet.value = false },
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                             modifier = Modifier.weight(1f)
                         ) {
@@ -228,7 +254,7 @@ fun PartialBottomSheet(onSave: (String, String, String) -> Unit) {
                         Button(
                             onClick = {
                                 onSave(wordState, meaningState, sentenceState)
-                                showBottomSheet = false
+                                showSheet.value = false
                                 wordState = ""
                                 meaningState = ""
                                 sentenceState = ""

@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.self_vocab.Destination
 import com.example.self_vocab.R
 import com.example.self_vocab.ui.theme.PrimaryColor
 import kotlinx.coroutines.delay
@@ -41,9 +42,7 @@ fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         alpha.animateTo(1f, animationSpec = tween(2000))
         delay(2000) // Simulate loading
-        navController.navigate("home"){
-            popUpTo("splash"){inclusive = true}
-        }
+        navController.navigate(Destination.MAIN_SCREEN.route)
     }
 
     Box(
