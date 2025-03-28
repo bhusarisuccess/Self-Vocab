@@ -2,6 +2,7 @@ package com.example.self_vocab.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.self_vocab.data.database.Word
+import com.example.self_vocab.data.database.WordDao
 import com.example.self_vocab.repository.DatabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +33,8 @@ class DictionaryViewModel @Inject constructor(private val repository: DatabaseRe
             repository.getAllWords().collect { _allWordList.value = it }
         }
     }
+
+
 
     fun getLatestWord(){
         viewModelScope.launch {

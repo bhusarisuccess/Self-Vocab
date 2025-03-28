@@ -11,7 +11,7 @@ interface WordDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWord(word: Word)
 
-    @Query("SELECT * FROM dictionary ORDER BY word ASC")
+    @Query("SELECT * FROM dictionary ORDER BY id DESC")
     fun getAllWords(): Flow<List<Word>>
 
     @Query("SELECT * FROM dictionary WHERE word LIKE :searchQuery")
@@ -21,5 +21,5 @@ interface WordDao {
     fun deleteWords(wordEntry: Word)
 
     @Query("SELECT * FROM dictionary ORDER BY id DESC LIMIT 1")
-    fun getLatestWord(): Flow<Word?>
+    fun getLatestWord(): Flow<List<Word?>>
 }
