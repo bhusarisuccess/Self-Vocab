@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.self_vocab.data.database.Word
+import com.example.self_vocab.ui.theme.PrimaryColor
 import com.example.self_vocab.viewmodel.DictionaryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +53,6 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun HomeContent(paddingValues: PaddingValues) {
    val viewModel: DictionaryViewModel = hiltViewModel()
-   val words by viewModel.latestWord.collectAsState()
     LaunchedEffect(Any()) {
         viewModel.getLatestWord()
     }
@@ -63,24 +63,73 @@ fun HomeContent(paddingValues: PaddingValues) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-       if(words.isNotEmpty()){
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "Word: ${words[0].word}", style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        text = "Meaning: ${words[0].meaning}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-        }else{
-           Text("No words added yet")
-       }
-
+        CardContent(viewModel)
     }
 }
 
+@Composable
+fun CardContent(viewModel: DictionaryViewModel) {
+    val words by viewModel.latestWord.collectAsState()
+    if(words.isNotEmpty()){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .shadow(4.dp, shape = RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Book,
+                    contentDescription = "Word Icon",
+                    tint = PrimaryColor,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = words[0].word,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryColor
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Meaning:",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.DarkGray
+            )
+            Text(
+                text = words[0].meaning,
+                fontSize = 14.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = "Sentence:",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.DarkGray
+            )
+            Text(
+                text = words[0].word,
+                fontSize = 14.sp,
+                fontStyle = FontStyle.Italic,
+                color = Color(0xFF37474F)
+            )
+        }
+    }
+    }else{
+        Text("No words added yet")
+    }
+}
 

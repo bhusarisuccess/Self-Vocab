@@ -147,7 +147,8 @@ fun WordList(viewModel: DictionaryViewModel) {
             .padding(5.dp)
     ) {
         items(words.size) { index ->
-            WordCard(word = words[index], onDelete = { viewModel.deleteWord(words[index]) })
+            WordCard(word = words[index], onDelete = {
+                viewModel.deleteWord(words[index]) })
         }
     }
 }
@@ -169,7 +170,7 @@ fun WordCard(word: Word, onDelete: () -> Unit) {
                 Icon(
                     imageVector = Icons.Default.Book,
                     contentDescription = "Word Icon",
-                    tint = Color(0xFF6200EE),
+                    tint = PrimaryColor,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -177,7 +178,7 @@ fun WordCard(word: Word, onDelete: () -> Unit) {
                     text = word.word,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF6200EE)
+                    color = PrimaryColor
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = onDelete) {
@@ -205,7 +206,7 @@ fun WordCard(word: Word, onDelete: () -> Unit) {
             )
 
             Text(
-                text = "Word:",
+                text = "Sentence:",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.DarkGray

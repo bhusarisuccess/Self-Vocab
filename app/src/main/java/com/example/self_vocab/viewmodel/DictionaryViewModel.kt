@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.self_vocab.data.database.Word
 import com.example.self_vocab.repository.DatabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -39,7 +40,7 @@ class DictionaryViewModel @Inject constructor(private val repository: DatabaseRe
     }
 
     fun deleteWord(wordEntry: Word){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.deleteWord(wordEntry)
         }
     }
