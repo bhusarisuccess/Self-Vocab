@@ -11,26 +11,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,24 +45,23 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.self_vocab.DViewModel.DictionaryViewModel
-import com.example.self_vocab.Entity.WordEntry
-import com.example.self_vocab.data.WordDatabase
+import com.example.self_vocab.data.database.Word
 import com.example.self_vocab.ui.theme.PrimaryColor
+import com.example.self_vocab.viewmodel.DictionaryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(navController: NavHostController) {
     var showSheet = remember { mutableStateOf(false) }
     Scaffold(
-        topBar = { TopAppBar(title = { Text("List") }) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 text = { Text(text = "Add Word") },
@@ -83,19 +87,15 @@ fun ListScreenContent(
     paddingValues: PaddingValues,
     showSheet: MutableState<Boolean>
 ) {
-    val database: WordDatabase = WordDatabase.getDatabase(LocalContext.current)
-    val viewModel: DictionaryViewModel = viewModel(factory = object : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            @Suppress("UNCHECKED_CAST")
-            return DictionaryViewModel(database) as T
-        }
-    })
+    val viewModel: DictionaryViewModel = hiltViewModel()
+    LaunchedEffect(Any()) {
+        viewModel.getAllWords()
+    }
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-    val words by viewModel.words.collectAsState()
     var searchText by remember { mutableStateOf("") }
     Box(
-        modifier = Modifier.padding(paddingValues),
+        modifier = Modifier.padding(top = 100.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -103,10 +103,10 @@ fun ListScreenContent(
                 .align(Alignment.TopCenter)
                 .padding(20.dp)
         ) {
-            SearchBar(searchText = searchText, onSearchTextChanged = { searchText = it })
+            SearchBar(searchText = searchText, onSearchTextChanged = { searchText = it
+            viewModel.searchWord(searchText)})
             Spacer(modifier = Modifier.height(5.dp))
-
-            WordList(words = words, viewModel = viewModel)
+            WordList(viewModel)
         }
         Column(
             modifier = Modifier.align(Alignment.BottomEnd),
@@ -115,7 +115,8 @@ fun ListScreenContent(
             PartialBottomSheet(
                 showSheet,
                 onSave = { word, meaning, sentence ->
-                    viewModel.addWord(word, meaning, sentence)
+                   viewModel.addWord(word, meaning)
+                    viewModel.getAllWords()
                     showSheet.value = false
                 }
             )
@@ -137,40 +138,87 @@ fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit) {
 }
 
 @Composable
-fun WordList(words: List<WordEntry>, viewModel: DictionaryViewModel) {
+fun WordList(viewModel: DictionaryViewModel) {
+    val words by viewModel.allWordList.collectAsState()
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .fillMaxWidth()
             .padding(5.dp)
     ) {
-        items(words) { word ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(2.dp)
-            ) {
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = "Word: ${word.word}", style = MaterialTheme.typography.titleLarge)
-                    Text(
-                        text = "Meaning: ${word.meaning}",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = "Sentence: ${word.sentence}",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Row {
-                        Button(onClick = { viewModel.deleteWord(word) }) {
-                            Text("Delete")
-                        }
-                    }
-                }
-            }
+        items(words.size) { index ->
+            WordCard(word = words[index], onDelete = { viewModel.deleteWord(words[index]) })
         }
     }
 }
 
+@Composable
+fun WordCard(word: Word, onDelete: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .shadow(4.dp, shape = RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Book,
+                    contentDescription = "Word Icon",
+                    tint = Color(0xFF6200EE),
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = word.word,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF6200EE)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Word",
+                        tint = Color.Red
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Meaning:",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.DarkGray
+            )
+            Text(
+                text = word.meaning,
+                fontSize = 14.sp,
+                color = Color.Black,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            Text(
+                text = "Word:",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.DarkGray
+            )
+            Text(
+                text = word.word,
+                fontSize = 14.sp,
+                fontStyle = FontStyle.Italic,
+                color = Color(0xFF37474F)
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

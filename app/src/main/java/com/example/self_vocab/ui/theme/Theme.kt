@@ -9,23 +9,35 @@ import androidx.compose.ui.graphics.Color
 
 
 // Light Theme Colors
-val LightColorScheme = lightColorScheme(
-    primary = PrimaryColor,
-    onPrimary = Color.White,
-    background = Color.White,
-    onBackground = Color.Black,
-    surface = Color.White,
-    onSurface = Color.Black
+
+private val DarkColorScheme = darkColorScheme(
+    primary = Purple80,
+    secondary = PurpleGrey80,
+    tertiary = Pink80,
+
+    background = Color(0xFF090E39),
+    surface = Color(0xFF090E39),
+    onPrimaryContainer = Purple80
+    /*onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F),*/
 )
 
-// Dark Theme Colors
-val DarkColorScheme = darkColorScheme(
-    primary = PrimaryColor,
-    onPrimary = Color.Black,
-    background = Color(0xFF121212),
-    onBackground = Color.White,
-    surface = Color(0xFF1E1E1E),
-    onSurface = Color.White
+private val LightColorScheme = lightColorScheme(
+    primary = Purple40,
+    secondary = PurpleGrey40,
+    tertiary = Pink40,
+
+    background = Color(0xFFFFFBFE),
+    surface = Color(0xFFFFFBFE),
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F),
+    onPrimaryContainer = Purple40
 )
 
 @Composable

@@ -1,4 +1,4 @@
-package com.example.self_vocab
+package com.example.self_vocab.navigation
 
 enum class Destination (val route:String){
     SPLASH_SCREEN("Splash"),

@@ -1,6 +1,5 @@
 package com.example.self_vocab.ui.screens
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -17,6 +16,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
@@ -26,14 +26,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.self_vocab.Destination
-import com.example.self_vocab.NavigationGraph
+import com.example.self_vocab.navigation.Destination
 import com.example.self_vocab.ui.theme.AppTheme
+import com.example.self_vocab.ui.theme.PrimaryColor
 
 
 data class BottomNavigationItem(
@@ -71,7 +72,7 @@ fun MainScreen(navController: NavController) {
                 hasNews = true,
             ),
         )
-        var selectedIndex = remember{
+        var selectedIndex = remember {
             mutableIntStateOf(0)
         }
         Surface(
@@ -79,12 +80,15 @@ fun MainScreen(navController: NavController) {
             color = MaterialTheme.colorScheme.background
         ) {
             Scaffold(
-                topBar = { Text(text = items[selectedIndex.value].title) },
+                topBar = { TopAppBar(title = { Text(items[selectedIndex.value].title, style = TextStyle(color = PrimaryColor)) }) },
                 bottomBar = {
-                    BottomNavigationBar(navController, items,selectedIndex)
+                    BottomNavigationBar(navController, items, selectedIndex)
                 }
             ) { paddingValue ->
-                NavHost(navController = navController, startDestination = Destination.HOME_SCREEN.route) {
+                NavHost(
+                    navController = navController,
+                    startDestination = Destination.HOME_SCREEN.route
+                ) {
                     composable(Destination.HOME_SCREEN.route) {
                         HomeScreen(navController)
                     }
@@ -116,14 +120,14 @@ private fun BottomNavigationBar(
                 onClick = {
                     selectedItemIndex = index
                     selectedIndex.value = index
-                    navController.navigate(item.title){
+                    navController.navigate(item.title) {
                         launchSingleTop = true
                     }
                 },
                 label = {
                     Text(text = item.title)
                 },
-                alwaysShowLabel = false,
+                alwaysShowLabel = true,
                 icon = {
                     Icon(
                         imageVector = if (index == selectedItemIndex) {
@@ -137,16 +141,9 @@ private fun BottomNavigationBar(
     }
 }
 
-@Composable
-fun MainScreenContent(name: String, paddingValue: PaddingValues) {
-    Text(
-        text = "Hello $name!",
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun MainScreenPreview() {
     AppTheme {
         MainScreen(rememberNavController())
     }

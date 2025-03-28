@@ -1,4 +1,4 @@
-package com.example.self_vocab
+package com.example.self_vocab.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
