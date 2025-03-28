@@ -121,7 +121,7 @@ fun CardContent(viewModel: DictionaryViewModel) {
                 color = Color.DarkGray
             )
             Text(
-                text = words[0].word,
+                text = words[0].sentence,
                 fontSize = 14.sp,
                 fontStyle = FontStyle.Italic,
                 color = Color(0xFF37474F)

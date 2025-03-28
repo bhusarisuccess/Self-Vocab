@@ -1,6 +1,8 @@
 package com.example.self_vocab.ui.screens
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
@@ -28,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -79,7 +82,7 @@ fun MainScreen(navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Scaffold(
+            Scaffold(modifier = Modifier.padding(paddingValues = PaddingValues(top = 20.dp, bottom = 20.dp)),
                 topBar = { TopAppBar(title = { Text(items[selectedIndex.value].title, style = TextStyle(color = PrimaryColor)) }) },
                 bottomBar = {
                     BottomNavigationBar(navController, items, selectedIndex)

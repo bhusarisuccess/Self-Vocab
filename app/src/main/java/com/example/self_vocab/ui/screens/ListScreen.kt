@@ -95,7 +95,7 @@ fun ListScreenContent(
     val scope = rememberCoroutineScope()
     var searchText by remember { mutableStateOf("") }
     Box(
-        modifier = Modifier.padding(top = 100.dp),
+        modifier = Modifier.padding(top = 100.dp, bottom = 80.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -115,7 +115,7 @@ fun ListScreenContent(
             PartialBottomSheet(
                 showSheet,
                 onSave = { word, meaning, sentence ->
-                   viewModel.addWord(word, meaning)
+                   viewModel.addWord(word, meaning, sentence)
                     viewModel.getAllWords()
                     showSheet.value = false
                 }
@@ -212,7 +212,7 @@ fun WordCard(word: Word, onDelete: () -> Unit) {
                 color = Color.DarkGray
             )
             Text(
-                text = word.word,
+                text = word.sentence,
                 fontSize = 14.sp,
                 fontStyle = FontStyle.Italic,
                 color = Color(0xFF37474F)
