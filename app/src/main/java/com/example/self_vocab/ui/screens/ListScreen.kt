@@ -1,5 +1,7 @@
 package com.example.self_vocab.ui.screens
 
+import android.R
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.onFocusedBoundsChanged
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -31,8 +35,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,12 +54,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.room.util.TableInfo
 import com.example.self_vocab.data.database.Word
 import com.example.self_vocab.ui.theme.PrimaryColor
 import com.example.self_vocab.viewmodel.DictionaryViewModel
@@ -85,15 +94,16 @@ fun ListScreen(navController: NavHostController) {
 fun ListScreenContent(
     navController: NavHostController,
     paddingValues: PaddingValues,
-    showSheet: MutableState<Boolean>
+    showSheet: MutableState<Boolean>,
 ) {
     val viewModel: DictionaryViewModel = hiltViewModel()
     LaunchedEffect(Any()) {
         viewModel.getAllWords()
     }
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
     var searchText by remember { mutableStateOf("") }
+    val searchResults by viewModel.searchWordList.collectAsState()
+
+
     Box(
         modifier = Modifier.padding(top = 100.dp, bottom = 80.dp),
         contentAlignment = Alignment.Center
@@ -103,8 +113,20 @@ fun ListScreenContent(
                 .align(Alignment.TopCenter)
                 .padding(20.dp)
         ) {
-            SearchBar(searchText = searchText, onSearchTextChanged = { searchText = it
-            viewModel.searchWord(searchText)})
+            SearchBar(
+                searchText = searchText, onSearchTextChanged = {
+                    searchText = it
+                    viewModel.searchWord(it)
+                },
+                viewModel = viewModel
+            )
+            LazyColumn {
+                items(searchResults.size) { index ->
+                    WordCard(word = searchResults[index], onDelete = {
+                        viewModel.deleteWord(searchResults[index])
+                    })
+                }
+            }
             Spacer(modifier = Modifier.height(5.dp))
             WordList(viewModel)
         }
@@ -115,7 +137,7 @@ fun ListScreenContent(
             PartialBottomSheet(
                 showSheet,
                 onSave = { word, meaning, sentence ->
-                   viewModel.addWord(word, meaning, sentence)
+                    viewModel.addWord(word, meaning, sentence)
                     viewModel.getAllWords()
                     showSheet.value = false
                 }
@@ -123,23 +145,33 @@ fun ListScreenContent(
         }
     }
 }
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit) {
-    OutlinedTextField(
-        value = searchText,
-        onValueChange = onSearchTextChanged,
-        placeholder = { Text("Search") },
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth()
+fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit, viewModel: DictionaryViewModel) {
+    Column(modifier = Modifier
+        .wrapContentSize()
+        .padding(16.dp)) {
+        OutlinedTextField(
+            value = searchText,
+            onValueChange = { onSearchTextChanged(it) },
+            shape = RoundedCornerShape(15.dp),
+            placeholder = { Text("Search") },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(color = PrimaryColor, width = 2.dp, shape = RoundedCornerShape(15.dp))
+        )
 
-    )
-}
+
+        }
+
+    }
 
 @Composable
 fun WordList(viewModel: DictionaryViewModel) {
     val words by viewModel.allWordList.collectAsState()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -148,7 +180,8 @@ fun WordList(viewModel: DictionaryViewModel) {
     ) {
         items(words.size) { index ->
             WordCard(word = words[index], onDelete = {
-                viewModel.deleteWord(words[index]) })
+                viewModel.deleteWord(words[index])
+            })
         }
     }
 }

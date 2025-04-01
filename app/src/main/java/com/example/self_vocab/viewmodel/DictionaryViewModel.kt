@@ -18,7 +18,7 @@ class DictionaryViewModel @Inject constructor(private val repository: DatabaseRe
     private val _latestWord = MutableStateFlow<List<Word>>(emptyList())
     val latestWord: StateFlow<List<Word>> get() = _latestWord
 
-    private val _searchWordList = MutableStateFlow<List<Word>>(emptyList())
+      private val _searchWordList = MutableStateFlow<List<Word>>(emptyList())
     val searchWordList: StateFlow<List<Word>> get() = _searchWordList
 
     fun addWord(word: String, meaning: String, sentence: String) {
@@ -46,7 +46,9 @@ class DictionaryViewModel @Inject constructor(private val repository: DatabaseRe
     }
     fun searchWord(query: String){
         viewModelScope.launch {
-            repository.searchWords(query).collect { _searchWordList.value = it }
+            repository.searchWords(query).collect {words ->
+                _searchWordList.value = words
+            }
         }
     }
 }
