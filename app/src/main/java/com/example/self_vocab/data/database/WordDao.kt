@@ -22,4 +22,7 @@ interface WordDao {
 
     @Query("SELECT * FROM dictionary ORDER BY id DESC LIMIT 1")
     fun getLatestWord(): Flow<List<Word?>>
+
+    @Query("SELECT * FROM dictionary ORDER BY RANDOM() LIMIT 1")
+    suspend fun getRandomWord(): Word?
 }

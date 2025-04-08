@@ -1,8 +1,10 @@
 package com.example.self_vocab.viewmodel
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.self_vocab.data.database.Word
 import com.example.self_vocab.repository.DatabaseRepository
+import com.example.self_vocab.utility.NotificationUtils.showWordAddedNotification
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DictionaryViewModel @Inject constructor(private val repository: DatabaseRepository) : ViewModel() {
+class DictionaryViewModel @Inject constructor(private val repository: DatabaseRepository, ) : ViewModel() {
     private val _allWordList = MutableStateFlow<List<Word>>(emptyList())
     val allWordList: StateFlow<List<Word>> get() = _allWordList
 
@@ -21,9 +23,13 @@ class DictionaryViewModel @Inject constructor(private val repository: DatabaseRe
       private val _searchWordList = MutableStateFlow<List<Word>>(emptyList())
     val searchWordList: StateFlow<List<Word>> get() = _searchWordList
 
-    fun addWord(word: String, meaning: String, sentence: String) {
+    private val _randomWord = MutableStateFlow<List<Word>>(emptyList())
+    val RandomWord: StateFlow<List<Word>> get() = _randomWord
+
+    fun addWord(word: String, meaning: String, sentence: String, context: Context) {
         viewModelScope.launch {
             repository.insertWord(Word(word = word, meaning = meaning, sentence = sentence))
+            showWordAddedNotification(context, word)
         }
     }
 
@@ -49,6 +55,14 @@ class DictionaryViewModel @Inject constructor(private val repository: DatabaseRe
             repository.searchWords(query).collect {words ->
                 _searchWordList.value = words
             }
+        }
+    }
+
+    fun fetchRandomWord() {
+        viewModelScope.launch {
+          repository.getRandomWord()?.let {
+              _randomWord.value = listOf(it)
+          }
         }
     }
 }

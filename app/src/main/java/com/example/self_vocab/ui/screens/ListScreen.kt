@@ -38,6 +38,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -137,7 +138,7 @@ fun ListScreenContent(
             PartialBottomSheet(
                 showSheet,
                 onSave = { word, meaning, sentence ->
-                    viewModel.addWord(word, meaning, sentence)
+                    viewModel.addWord(word, meaning, sentence, navController.context)
                     viewModel.getAllWords()
                     showSheet.value = false
                 }
@@ -145,12 +146,19 @@ fun ListScreenContent(
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit, viewModel: DictionaryViewModel) {
-    Column(modifier = Modifier
-        .wrapContentSize()
-        .padding(16.dp)) {
+fun SearchBar(
+    searchText: String,
+    onSearchTextChanged: (String) -> Unit,
+    viewModel: DictionaryViewModel
+) {
+    Column(
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(16.dp)
+    ) {
         OutlinedTextField(
             value = searchText,
             onValueChange = { onSearchTextChanged(it) },
@@ -164,9 +172,9 @@ fun SearchBar(searchText: String, onSearchTextChanged: (String) -> Unit, viewMod
         )
 
 
-        }
-
     }
+
+}
 
 @Composable
 fun WordList(viewModel: DictionaryViewModel) {
@@ -287,8 +295,15 @@ fun PartialBottomSheet(showSheet: MutableState<Boolean>, onSave: (String, String
                     OutlinedTextField(
                         value = wordState,
                         onValueChange = { wordState = it },
-                        label = { Text("Add Word") },
-                        modifier = Modifier.fillMaxWidth()
+                        placeholder = { Text("Add Word") },
+                        shape = RoundedCornerShape(15.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                color = PrimaryColor,
+                                width = 3.dp,
+                                shape = RoundedCornerShape(15.dp)
+                            )
                     )
                     Spacer(
                         modifier = Modifier
@@ -298,8 +313,15 @@ fun PartialBottomSheet(showSheet: MutableState<Boolean>, onSave: (String, String
                     OutlinedTextField(
                         value = meaningState,
                         onValueChange = { meaningState = it },
-                        label = { Text("Add Meaning") },
-                        modifier = Modifier.fillMaxWidth()
+                        placeholder = { Text("Add Meaning") },
+                        shape = RoundedCornerShape(15.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                color = PrimaryColor,
+                                width = 3.dp,
+                                shape = RoundedCornerShape(15.dp),
+                            )
 
 
                     )
@@ -311,8 +333,16 @@ fun PartialBottomSheet(showSheet: MutableState<Boolean>, onSave: (String, String
                     OutlinedTextField(
                         value = sentenceState,
                         onValueChange = { sentenceState = it },
-                        label = { Text("Add Sentence") },
-                        modifier = Modifier.fillMaxWidth()
+                        placeholder = { Text("Add Sentence") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                color = PrimaryColor,
+                                width = 3.dp,
+                                shape = RoundedCornerShape(15.dp)
+                            ),
+                        shape = RoundedCornerShape(15.dp)
+
                     )
                     Spacer(
                         modifier = Modifier
@@ -341,6 +371,7 @@ fun PartialBottomSheet(showSheet: MutableState<Boolean>, onSave: (String, String
                                 meaningState = ""
                                 sentenceState = ""
                             },
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
                             modifier = Modifier.weight(1f)
                         ) {
                             Text("Add")

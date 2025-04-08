@@ -79,7 +79,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     //hilt dependenices
-    implementation ("com.google.dagger:hilt-android:2.54")
+    implementation ("com.google.dagger:hilt-android:2.55")
     kapt ("com.google.dagger:hilt-compiler:2.54")
     annotationProcessor ("com.google.dagger:hilt-compiler:2.54")
     kapt("androidx.hilt:hilt-compiler:1.2.0")
@@ -103,4 +103,11 @@ dependencies {
 
     // ViewModel KTX (Recommended for state management)
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+
+    implementation ("androidx.work:work-runtime-ktx:2.10.0")
+
+    implementation ("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
+
+    implementation( "androidx.core:core-ktx:1.15.0") // or latest
+
 }
