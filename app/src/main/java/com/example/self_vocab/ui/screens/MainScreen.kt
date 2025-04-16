@@ -82,7 +82,7 @@ fun MainScreen(navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Scaffold(modifier = Modifier.padding(paddingValues = PaddingValues(top = 20.dp, bottom = 20.dp)),
+            Scaffold(modifier = Modifier.padding(paddingValues = PaddingValues(top = 20.dp)),
                 topBar = { TopAppBar(title = { Text(items[selectedIndex.value].title, style = TextStyle(color = PrimaryColor)) }) },
                 bottomBar = {
                     BottomNavigationBar(navController, items, selectedIndex)

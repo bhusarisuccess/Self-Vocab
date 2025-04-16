@@ -10,17 +10,34 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
+import androidx.glance.GlanceId
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.self_vocab.Widget.DictionaryWidget
+import com.example.self_vocab.Widget.DictionaryWidgetWorker
 import com.example.self_vocab.navigation.NavigationGraph
 import com.example.self_vocab.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        createNotificationChannel()
 
+        val request = PeriodicWorkRequestBuilder<DictionaryWidgetWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(Constraints.Builder().setRequiresBatteryNotLow(true).build())
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "widget_update",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            request
+        )
+
+        createNotificationChannel()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(
                 this, arrayOf(POST_NOTIFICATIONS), 1001

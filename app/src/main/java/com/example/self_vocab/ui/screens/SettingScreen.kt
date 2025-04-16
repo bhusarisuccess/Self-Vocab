@@ -36,8 +36,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.example.self_vocab.Widget.DictionaryWidgetWorker
 import com.example.self_vocab.ui.theme.PrimaryColor
 import com.example.self_vocab.viewmodel.DictionaryViewModel
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,50 +114,7 @@ fun TimeIntervalSetting(onTimeSelected: (Long) -> Unit) {
 }
 
 
-//
-//@Composable
-//fun TimeIntervalSetting(onIntervalSet: (Long) -> Unit) {
-//    var intervalText by remember { mutableStateOf("") }
-//    val context = LocalContext.current
-//
-//    Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-//        Text("Set Refresh Interval (Minutes)", style = MaterialTheme.typography.titleLarge)
-//        Spacer(Modifier.height(16.dp))
-//        TextField(
-//            value = intervalText,
-//            onValueChange = { intervalText = it },
-//            label = { Text("Interval") },
-//            shape = RoundedCornerShape(10.dp),
-//            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//            modifier = Modifier
-//                .border(
-//                    color = PrimaryColor,
-//                    width = 2.dp,
-//                    shape = RoundedCornerShape(5.dp)
-//                )
-//                .align(alignment = Alignment.CenterHorizontally)
-//        )
-//        Spacer(Modifier.height(16.dp))
-//        Button(
-//            onClick = {
-//                val minutes = intervalText.toLongOrNull() ?: 0
-//                saveIntervalToPrefs(context, minutes)
-//                onIntervalSet(minutes)
-//            },
-//            modifier = Modifier
-//                .padding(20.dp)
-//                .align(alignment = Alignment.CenterHorizontally),
-//            shape = RoundedCornerShape(10.dp),
-//            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-//                containerColor = PrimaryColor,
-//                contentColor = Color.Black
-//            )
-//        ) {
-//            Text("Save Interval")
-//        }
-//    }
-//}
-//
+
 //fun saveIntervalToPrefs(context: Context, minutes: Long) {
 //    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 //    prefs.edit().putLong("interval_minutes", minutes).apply()

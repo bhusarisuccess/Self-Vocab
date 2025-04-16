@@ -1,6 +1,8 @@
 package com.example.self_vocab.repository
 
 import android.content.Context
+import androidx.glance.GlanceId
+import com.example.self_vocab.Widget.DictionaryWidget
 import com.example.self_vocab.data.database.Word
 import com.example.self_vocab.data.database.WordDao
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -11,7 +13,6 @@ import javax.inject.Singleton
 @Singleton
 class DatabaseRepository @Inject constructor(
     private val wordDao: WordDao,
-    @ApplicationContext private val context: Context
 ) {
     suspend fun insertWord(word: Word) = wordDao.insertWord(word)
     fun getAllWords(): Flow<List<Word>> = wordDao.getAllWords()
@@ -21,5 +22,5 @@ class DatabaseRepository @Inject constructor(
         wordDao.deleteWords(wordEntry)
     }
 
-    suspend fun getRandomWord(): Word? = wordDao.getRandomWord()
+     suspend fun getRandomWord(): Word? = wordDao.getRandomWord()
 }

@@ -11,6 +11,7 @@ import com.example.self_vocab.repository.DatabaseRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -19,30 +20,29 @@ import javax.inject.Singleton
 object DatabaseModule {
     @Provides
     @Singleton
-    fun provideDatabase(app: Application): DictionaryDatabase {
-        val MIGRATION_1_2 = object : Migration(1, 2) {
+    fun provideDatabase(@ApplicationContext context: Context): DictionaryDatabase {
+        val MIGRATION_1_2 = object : Migration(1, 2  ) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE your_table ADD COLUMN new_column_name TEXT DEFAULT ''")
             }
         }
                 return Room.databaseBuilder(
-                    app,
+                    context,
                     DictionaryDatabase::class.java,
                     "dictionary_db"
-                ).addMigrations(MIGRATION_1_2)
+                ).fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_1_2)
                     .build()
             }
 
 
 
     @Provides
-    fun provideWordDao(database: DictionaryDatabase): WordDao {
-        return database.wordDao()
-    }
+    fun provideWordDao(database: DictionaryDatabase): WordDao = database.wordDao()
 
     @Provides
     @Singleton
-    fun provideDatabaseRepository(wordDao: WordDao): DatabaseRepository {
-        return DatabaseRepository(wordDao, Application())
+    fun provideDatabaseRepository(wordDao: WordDao,): DatabaseRepository {
+        return DatabaseRepository(wordDao)
     }
 }
